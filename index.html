@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Study Planner</title>
+
+<meta name="description" content="Student Study Planner helps students manage study tasks and track their progress.">
+
+<meta name="keywords" content="Student Study Planner, study planner, student tasks, study management">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="auth-screen" id="authScreen">
+        <div class="auth-brand-panel">
+            <div class="brand-mark">✦</div>
+            <p class="eyebrow">STUDY SMARTER</p>
+            <h1>Your goals are closer than you think.</h1>
+            <p class="brand-copy">Organize your study sessions, keep your momentum, and make progress you can see every day.</p>
+            <div class="auth-benefits">
+                <span>✓ Keep every task in one place</span>
+                <span>✓ Track your progress effortlessly</span>
+                <span>✓ Build a routine that works for you</span>
+            </div>
+        </div>
+
+        <section class="auth-card" aria-labelledby="authTitle">
+            <div class="auth-card-header">
+                <div class="small-logo">📚</div>
+                <p class="eyebrow">STUDENT STUDY PLANNER</p>
+                <h2 id="authTitle">Welcome back</h2>
+                <p id="authSubtitle">Sign in to continue your study journey.</p>
+            </div>
+            <div class="auth-tabs" role="tablist" aria-label="Account access">
+                <button class="auth-tab active" id="loginTab" type="button" role="tab" aria-selected="true">Log in</button>
+                <button class="auth-tab" id="signupTab" type="button" role="tab" aria-selected="false">Create account</button>
+            </div>
+            <form id="authForm">
+                <div class="field-group" id="nameField" hidden>
+                    <label for="authName">Your name</label>
+                    <input type="text" id="authName" placeholder="Alex Johnson" autocomplete="name">
+                </div>
+                <div class="field-group">
+                    <label for="authEmail">Email address</label>
+                    <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email" required>
+                </div>
+                <div class="field-group">
+                    <div class="field-label-row">
+                        <label for="authPassword">Password</label>
+                        <button type="button" class="text-button" id="forgotPassword">Forgot password?</button>
+                    </div>
+                    <input type="password" id="authPassword" placeholder="At least 6 characters" autocomplete="current-password" minlength="6" required>
+                </div>
+                <label class="checkbox-row" id="termsRow" hidden>
+                    <input type="checkbox" id="terms">
+                    <span>I agree to the terms and privacy policy.</span>
+                </label>
+                <button class="auth-submit" type="submit" id="authSubmit">Log in <span>→</span></button>
+                <p class="auth-message" id="authMessage" role="status"></p>
+            </form>
+        </section>
+    </main>
+
+    <div class="container" id="plannerApp" hidden>
+
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1>📚 Student Study Planner</h1>
+                    <p>Plan your study. Track your progress.</p>
+                </div>
+                <div class="user-profile" id="userProfile">
+                    <div class="profile-avatar" id="profileAvatar">A</div>
+                    <div class="profile-details">
+                        <strong id="profileName">Student</strong>
+                        <span id="profileEmail">student@example.com</span>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn" type="button">Log out</button>
+                </div>
+            </div>
+            <button id="themeBtn">🌙 Dark Mode</button>
+        </header>
+
+        <!-- Statistics -->
+        <section class="stats">
+
+            <div class="stat-card">
+                <h3>Total Tasks</h3>
+                <p id="totalTasks">0</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Completed</h3>
+                <p id="completedTasks">0</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Pending</h3>
+                <p id="pendingTasks">0</p>
+            </div>
+
+        </section>
+
+        <!-- Progress -->
+        <section class="progress-section">
+            <h3>Study Progress</h3>
+
+            <div class="progress-bar">
+                <div id="progress"></div>
+            </div>
+
+            <p id="progressText">0% Completed</p>
+        </section>
+
+        <!-- Add Task -->
+        <section class="add-task">
+
+            <h2>Add New Task</h2>
+
+            <form id="taskForm">
+
+                <input
+                    type="text"
+                    id="taskTitle"
+                    placeholder="Enter task name"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="subject"
+                    placeholder="Subject"
+                    required
+                >
+
+                <select id="priority">
+                    <option value="High">High</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+
+                <input
+                    type="date"
+                    id="dueDate"
+                    required
+                >
+
+                <button type="submit">➕ Add Task</button>
+
+            </form>
+
+        </section>
+<!-- Calendar -->
+<section class="calendar-section">
+
+    <h2>📅 Study Calendar</h2>
+
+    <input type="date" id="calendarDate">
+
+    <div id="calendarTasks"></div>
+
+</section>
+        <!-- Weekly Progress -->
+<section class="weekly-progress">
+
+    <h2>📊 Weekly Progress</h2>
+
+    <div class="weekly-bar">
+        <div id="weeklyProgress"></div>
+    </div>
+
+    <p id="weeklyProgressText">0% This Week</p>
+
+</section>
+<!-- Reminders -->
+<section class="reminder-section">
+
+    <h2>🔔 Study Reminders</h2>
+
+    <p id="reminderText">
+        No reminders yet.
+    </p>
+
+</section>
+<!-- Study Analytics -->
+<section class="analytics-section">
+
+    <h2>📈 Study Analytics</h2>
+
+    <p id="analyticsText">
+        Total study tasks: 0
+    </p>
+
+</section>
+        <!-- Search & Filter -->
+        <section class="controls">
+
+            <input
+                type="text"
+                id="search"
+                placeholder="🔍 Search tasks..."
+            >
+
+            <select id="filter">
+                <option value="all">All Tasks</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="high">High Priority</option>
+            </select>
+
+        </section>
+
+        <!-- Task List -->
+        <section class="task-section">
+
+            <h2>My Tasks</h2>
+
+            <div id="taskList"></div>
+
+        </section>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
