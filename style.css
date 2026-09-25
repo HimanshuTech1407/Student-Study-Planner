@@ -299,7 +299,8 @@ input:focus,select:focus {
 }
 .panel {
   padding:20px;
-  margin-bottom:18px
+  margin-bottom:18px;
+  min-width:0
 }
 .panel h2 {
   font-size:19px;
@@ -321,13 +322,18 @@ input:focus,select:focus {
 }
 .grid {
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   gap:18px
 }
 .task-form {
   display:grid;
-  grid-template-columns:2fr 1.1fr 1fr 1.1fr auto;
+  grid-template-columns:minmax(0,2fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,1.1fr) auto;
   gap:8px
+}
+.task-form input,.task-form select,
+#calendarDate {
+  width:100%;
+  min-width:0
 }
 .calendar-tasks {
   margin-top:12px
@@ -383,6 +389,34 @@ input:focus,select:focus {
   justify-content:center;
   gap:9px;
   margin-top:18px
+}
+.timer-settings {
+  display:flex;
+  justify-content:center;
+  align-items:end;
+  gap:9px;
+  margin-top:18px
+}
+.timer-settings label {
+  color:#dbeafe;
+  font-size:12px;
+  text-align:left
+}
+.timer-settings input {
+  display:block;
+  width:105px;
+  margin-top:4px;
+  padding:8px 9px
+}
+.timer-settings .secondary {
+  padding:8px 12px
+}
+.timer-settings-message {
+  min-height:19px;
+  margin:8px 0 0;
+  color:#dbeafe;
+  font-size:12px;
+  text-align:center
 }
 .focus .secondary {
   background:transparent;
@@ -510,6 +544,13 @@ input:focus,select:focus {
   .controls input {
     min-width:100%
   }
+  .app {
+    width:100%;
+    overflow:hidden
+  }
+  .panel,.topbar {
+    width:100%
+  }
 }
 @media(max-width:480px) {
   .auth-card {
@@ -529,6 +570,30 @@ input:focus,select:focus {
   }
   .task-form .primary {
     grid-column:auto
+  }
+  .panel {
+    padding:16px
+  }
+  .stats {
+    grid-template-columns:1fr
+  }
+  .profile {
+    gap:8px
+  }
+  .profile .secondary {
+    flex:1
+  }
+  .row {
+    align-items:flex-start
+  }
+  .timer-settings {
+    flex-wrap:wrap
+  }
+  .timer-settings label {
+    flex:1 1 120px
+  }
+  .timer-settings .secondary {
+    flex:1 1 100%
   }
 }
 .password-field {
