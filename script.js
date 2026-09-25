@@ -1,7 +1,10 @@
 let tasks = JSON.parse(localStorage.getItem("studyPlannerTasks") || "[]");
 let authMode = "login";
 let timerType = "focus";
-let timerSeconds = 1500;
+const timerSettingsKey = "studyPlannerTimerSettings";
+const defaultTimerSettings = { focusMinutes: 25, breakMinutes: 5 };
+let timerSettings = JSON.parse(localStorage.getItem(timerSettingsKey) || "null") || defaultTimerSettings;
+let timerSeconds = timerSettings.focusMinutes * 60;
 let timerRunning = false;
 let timerId = null;
 let completedSessions = 0;
@@ -24,9 +27,14 @@ const settingsPanel = $("settingsPanel");
 const customizeBtn = $("customizeBtn");
 const customizePanel = $("customizePanel");
 const togglePassword = $("togglePassword");
+const currentUserKey = "studyPlannerCurrentUser";
 
 function saveTasks() {
     localStorage.setItem("studyPlannerTasks", JSON.stringify(tasks));
+}
+
+function getTimerDuration(type) {
+    return (type === "focus" ? timerSettings.focusMinutes : timerSettings.breakMinutes) * 60;
 }
 
 function setAuthMode(mode) {
@@ -97,8 +105,14 @@ authForm.addEventListener("submit", (event) => {
             authMessage.textContent = "Please accept the terms to continue.";
             return;
         }
+        if (account && account.email === email) {
+            authMessage.textContent = "An account with this email already exists. Please log in.";
+            return;
+        }
         localStorage.setItem("studyPlannerAccount", JSON.stringify({ name, email, password }));
-        showPlanner({ name, email });
+        const user = { name, email };
+        localStorage.setItem(currentUserKey, JSON.stringify(user));
+        showPlanner(user);
     } else if (authMode === "reset") {
         if (!account || account.email !== email) {
             authMessage.textContent = "No account found with this email.";
@@ -116,11 +130,16 @@ authForm.addEventListener("submit", (event) => {
             authMessage.textContent = "That email or password is incorrect.";
             return;
         }
+        localStorage.setItem(currentUserKey, JSON.stringify({
+            name: account.name,
+            email: account.email
+        }));
         showPlanner(account);
     }
 });
 
 $("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem(currentUserKey);
     plannerApp.hidden = true;
     authScreen.hidden = false;
     authForm.reset();
@@ -255,7 +274,7 @@ function renderTimer() {
     const minutes = String(Math.floor(timerSeconds / 60)).padStart(2, "0");
     const seconds = String(timerSeconds % 60).padStart(2, "0");
     $("timerDisplay").textContent = `${minutes}:${seconds}`;
-    $("timerProgress").style.width = ((1500 - timerSeconds) / (timerType === "focus" ? 1500 : 300) * 100) + "%";
+    $("timerProgress").style.width = ((getTimerDuration(timerType) - timerSeconds) / getTimerDuration(timerType) * 100) + "%";
     $("focusMode").textContent = timerType === "focus" ? "Focus time" : "Short break";
     $("focusSession").textContent = "Session " + (completedSessions + 1);
     $("timerStart").textContent = timerRunning ? "⏸ Pause" : "▶ Start focus";
@@ -271,7 +290,7 @@ $("timerStart").addEventListener("click", () => {
                 timerRunning = false;
                 if (timerType === "focus") completedSessions++;
                 timerType = timerType === "focus" ? "break" : "focus";
-                timerSeconds = timerType === "focus" ? 1500 : 300;
+                timerSeconds = getTimerDuration(timerType);
                 $("focusMessage").textContent = timerType === "focus" ? "Break over. Ready for another session?" : "Great work! Take a short break.";
             }
             renderTimer();
@@ -284,7 +303,29 @@ $("timerReset").addEventListener("click", () => {
     clearInterval(timerId);
     timerRunning = false;
     timerType = "focus";
-    timerSeconds = 1500;
+    timerSeconds = getTimerDuration("focus");
+    $("focusMessage").textContent = "Stay focused. You've got this!";
+    renderTimer();
+});
+
+$("applyTimerSettings").addEventListener("click", () => {
+    const focusMinutes = Number($("focusMinutes").value);
+    const breakMinutes = Number($("breakMinutes").value);
+    const validFocus = Number.isInteger(focusMinutes) && focusMinutes >= 1 && focusMinutes <= 180;
+    const validBreak = Number.isInteger(breakMinutes) && breakMinutes >= 1 && breakMinutes <= 60;
+
+    if (!validFocus || !validBreak) {
+        $("timerSettingsMessage").textContent = "Focus: 1-180 minutes, break: 1-60 minutes.";
+        return;
+    }
+
+    clearInterval(timerId);
+    timerRunning = false;
+    timerType = "focus";
+    timerSettings = { focusMinutes, breakMinutes };
+    localStorage.setItem(timerSettingsKey, JSON.stringify(timerSettings));
+    timerSeconds = getTimerDuration("focus");
+    $("timerSettingsMessage").textContent = "Timer settings saved.";
     $("focusMessage").textContent = "Stay focused. You've got this!";
     renderTimer();
 });
@@ -296,7 +337,13 @@ if (localStorage.getItem("darkMode") === "true") {
 const savedTheme = localStorage.getItem("dashboardTheme") || "ocean";
 document.body.classList.add("theme-" + savedTheme);
 document.querySelectorAll(".theme-option").forEach((button) => button.classList.toggle("active", button.dataset.theme === savedTheme));
+$("focusMinutes").value = timerSettings.focusMinutes;
+$("breakMinutes").value = timerSettings.breakMinutes;
 renderTimer();
 updateWeeklyProgress();
 displayTasks();
-updateAnalytics();
+
+const savedUser = JSON.parse(localStorage.getItem(currentUserKey) || "null");
+if (savedUser && getAccount() && getAccount().email === savedUser.email) {
+    showPlanner(savedUser);
+}
